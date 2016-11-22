@@ -1,3 +1,4 @@
+
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -18,11 +19,12 @@ public class Sugestao {
     private int idUser;
     private int idCategoria;
     private int idStatus;
+    private String userName;
 
     public Sugestao() {
     }
 
-    public Sugestao(int idSugestao, Date dataCadSugestao, Date dataUpdateSugestao, String titulo, String textSugestao, String categoria, int idUser, int idCategoria, int idStatus) {
+    public Sugestao(int idSugestao, Date dataCadSugestao, Date dataUpdateSugestao, String titulo, String textSugestao, String categoria, int idUser, int idCategoria, int idStatus, String userName) {
         this.idSugestao = idSugestao;
         this.dataCadSugestao = dataCadSugestao;
         this.dataUpdateSugestao = dataUpdateSugestao;
@@ -32,13 +34,30 @@ public class Sugestao {
         this.idUser = idUser;
         this.idCategoria = idCategoria;
         this.idStatus = idStatus;
+        this.userName = userName;
+    }
+
+    public Sugestao(Date dataCadSugestao, String titulo, String textSugestao, int idUser, int idCategoria) {
+        this.dataCadSugestao = dataCadSugestao;
+        this.titulo = titulo;
+        this.textSugestao = textSugestao;
+        this.idUser = idUser;
+        this.idCategoria = idCategoria;
+    }
+
+    Sugestao(String toString) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 // Getters
     public int getIdSugestao() {
         return idSugestao;
     }
-    public String getCategoria(){
+    public String getUserName(){
+        return userName;
+    }
+
+    public String getCategoria() {
         return categoria;
     }
 
@@ -70,7 +89,9 @@ public class Sugestao {
         return idStatus;
     }
 //Stters 
-
+    public void setUserName(String userName){
+        this.userName = userName;
+    }
     public void setIdSugestao(int idSugestao) {
         this.idSugestao = idSugestao;
     }
@@ -86,9 +107,11 @@ public class Sugestao {
     public void setTitulo(String titulo) {
         this.titulo = titulo;
     }
-    public void setCategoria(String categoria){
+
+    public void setCategoria(String categoria) {
         this.categoria = categoria;
     }
+
     public void setTextSugestao(String textSugestao) {
         this.textSugestao = textSugestao;
     }
@@ -105,7 +128,26 @@ public class Sugestao {
         this.idStatus = idStatus;
     }
 
+    public void insertSugestao(Connection conn) {
+        String sqlInsert = "INSERT INTO cad_sugestao (datacad_sugestao, titulo_sugestao, "
+                + "txt_sugestao, id_user, id_categoria, id_status) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement stm = conn.prepareStatement(sqlInsert);) {
+            stm.setDate(1, this.getDataCadSugestao());
+            stm.setString(2, this.getTitulo());
+            stm.setString(3, this.getTextSugestao());
+            stm.setInt(4, this.getIdUser());
+            stm.setInt(5, this.getIdCategoria());
+            stm.setInt(6, this.getIdStatus());
+            stm.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
+
 /*public void incluir(Connection conn) {
         String sqlInsert = "INSERT INTO cliente(id, nome, fone) VALUES (?, ?, ?)";
 
@@ -115,7 +157,7 @@ public class Sugestao {
             stm.setString(3, getFone());
             stm.execute();
             //incluir os pedidos
-            for (Pedido pedido : pedidos) {
+            for (Sugestao pedido : pedidos) {
                 pedido.incluir(getIdCliente(), conn);
             }
         } catch (Exception e) {
@@ -132,7 +174,7 @@ public class Sugestao {
         String sqlDelete = "DELETE FROM cliente WHERE id = ?";
         try (PreparedStatement stm = conn.prepareStatement(sqlDelete);) {
             //excluir primeiro os pedidos
-            for (Pedido pedido : pedidos) {
+            for (Sugestao pedido : pedidos) {
                 pedido.excluir(conn);
             }
             //depois excluir o cliente
@@ -186,7 +228,7 @@ public class Sugestao {
                 if (rs.next()) {
                     setNome(rs.getString("nome"));
                     setFone(rs.getString("fone"));
-                    pedidos = carregarPedidos(conn);
+                    pedidos = carregarSugestaos(conn);
                 } else {
                     setNome(null);
                     setFone(null);
