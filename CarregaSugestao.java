@@ -125,6 +125,7 @@ public class CarregaSugestao {
                 + "JOIN tab_status st ON sug.id_status = st.id_status "
                 + "JOIN cad_categoria cat ON cat.id_categoria = sug.id_categoria "
                 + "JOIN cad_usuario user ON sug.id_user = user.id_user "
+                + "JOIN aso_user_categoria avalia ON avalia.id_categoria = cat.id_categoria "
                 + "WHERE st.nome_status = 'Pendente'";
 
         ArrayList<Sugestao> listar = new ArrayList<>();
